@@ -1,18 +1,7 @@
-import express, { type Application } from "express";
-import dotenv from "dotenv";
+import app from "./app"
+import config from "./config/config"
 
-
-dotenv.config();
-const app: Application = express();
-// const port = 3000
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
-const port = process.env.PORT || 5000
+const port = config.port;
 app.listen(port, () => {
     console.log(`DevTrack Server is listening on port ${port}`)
 })
