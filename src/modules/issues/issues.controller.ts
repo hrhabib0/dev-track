@@ -3,7 +3,6 @@ import type { JwtPayload } from "jsonwebtoken";
 import { issuesServices } from "./issues.services";
 
 const createIssues = async (req: Request, res: Response) => {
-    console.log("issues coming up...")
     try {
         const { title, description, type } = req.body;
         const reporter_id = (req.user as JwtPayload).id;
@@ -26,6 +25,23 @@ const createIssues = async (req: Request, res: Response) => {
     }
 }
 
+// get all issues
+const getAllIssues = async (req: Request, res: Response) => {
+    try {
+        const issues = await issuesServices.getAllIssuesFromDB(req.query);
+        return res.status(200).json({
+            success: true,
+            data: issues,
+        });
+    } catch (error: any) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
 export const issuesController = {
     createIssues,
+    getAllIssues,
 }

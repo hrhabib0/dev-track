@@ -12,5 +12,5 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/auth", authRoute)
-app.use("/api", issuesRoute)
+app.use("/api/issues", issuesRoute)
 export default app;
