@@ -36,11 +36,19 @@ const createIssues = async (req: Request, res: Response) => {
             message: "Issue created  ad successfully",
             data: issue,
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
         return sendResponse(res, {
-            statusCode: 400,
+            statusCode: 500,
             success: false,
-            message: error.message,
+            message: "Something went wrong",
             data: null,
         });
     }
@@ -54,10 +62,20 @@ const getAllIssues = async (req: Request, res: Response) => {
             success: true,
             data: issues,
         });
-    } catch (error: any) {
-        return res.status(400).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
+        return sendResponse(res, {
+            statusCode: 500,
             success: false,
-            message: error.message,
+            message: "Something went wrong",
+            data: null,
         });
     }
 }
@@ -67,15 +85,25 @@ const getSingleIssue = async (req: Request, res: Response) => {
     try {
         // console.log(req.params.id)
         const { id } = req.params;
-        const issue = await issuesServices.getSingleIssueFromDB(id);
+        const issue = await issuesServices.getSingleIssueFromDB(id as string);
         return res.status(200).json({
             success: true,
             data: issue,
         });
-    } catch (error: any) {
-        return res.status(404).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
+        return sendResponse(res, {
+            statusCode: 500,
             success: false,
-            message: error.message,
+            message: "Something went wrong",
+            data: null,
         });
     }
 }
@@ -90,10 +118,20 @@ const updateIssue = async (req: Request, res: Response) => {
             message: "Issue updated successfully",
             data: updatedIssue,
         });
-    } catch (error: any) {
-        return res.status(400).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
+        return sendResponse(res, {
+            statusCode: 500,
             success: false,
-            message: error.message,
+            message: "Something went wrong",
+            data: null,
         });
     }
 }
@@ -114,10 +152,20 @@ const deleteIssue = async (req: Request, res: Response) => {
             message: "Issue deleted successfully",
         });
 
-    } catch (error: any) {
-        return res.status(400).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
+        return sendResponse(res, {
+            statusCode: 500,
             success: false,
-            message: error.message,
+            message: "Something went wrong",
+            data: null,
         });
     }
 }

@@ -1,6 +1,7 @@
 import { pool } from "../../db/db"
+import type { IIssue } from "./issues.interface";
 
-const createIssuesIntoDB = async (payload: any) => {
+const createIssuesIntoDB = async (payload: IIssue) => {
     const { title, description, type, reporter_id } = payload;
     const result = await pool.query(`
         INSERT INTO issues(title, description, type, reporter_id)
@@ -92,7 +93,7 @@ const getAllIssuesFromDB = async (query: any) => {
 }
 
 // get singleIssueFromDB
-const getSingleIssueFromDB = async (id: any) => {
+const getSingleIssueFromDB = async (id: string) => {
     const result = await pool.query(`
         SELECT * FROM issues
         WHERE id=$1
@@ -124,7 +125,7 @@ const getSingleIssueFromDB = async (id: any) => {
 }
 
 // update a issue into db
-const updateIssueIntoDB = async (issueId: string, payload: any, currentUser: any) => {
+const updateIssueIntoDB = async (issueId: string, payload: IIssue, currentUser: any) => {
     const issueResult = await pool.query(`
         SELECT * FROM issues
         WHERE id=$1

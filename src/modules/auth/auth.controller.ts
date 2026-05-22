@@ -1,5 +1,6 @@
 import type { Request, Response } from "express"
 import { authServices } from "./auth.services"
+import sendResponse from "../../utils/sendResponse";
 
 const signUpUser = async (req: Request, res: Response) => {
     try {
@@ -22,11 +23,21 @@ const signUpUser = async (req: Request, res: Response) => {
             message: "User SignUp Successfully",
             data: result
         })
-    } catch (error: any) {
-        return res.status(500).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return sendResponse(res, {
+                statusCode: 500,
+                success: false,
+                message: error.message,
+                data: null,
+            });
+        }
+        return sendResponse(res, {
+            statusCode: 500,
             success: false,
-            message: error.message,
-        })
+            message: "Something went wrong",
+            data: null,
+        });
     }
 
 }
@@ -48,10 +59,17 @@ const logInUser = async (req: Request, res: Response) => {
             message: "Login successful",
             data: result,
         });
-    } catch (error: any) {
-        return res.status(401).json({
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return res.status(401).json({
+                success: false,
+                message: error.message,
+            });
+        }
+
+        return res.status(500).json({
             success: false,
-            message: error.message,
+            message: "Something went wrong",
         });
     }
 }
