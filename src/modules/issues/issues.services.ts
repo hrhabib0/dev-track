@@ -122,8 +122,85 @@ const getSingleIssueFromDB = async (id: any) => {
         updated_at: issue.updated_at,
     };
 }
+
+// update a issue into db
+const updateIssueIntoDB = async (issueId: string, payload: any, currentUser: any) => {
+    const issueResult = await pool.query(`
+        SELECT * FROM issues
+        WHERE id=$1
+        `, [issueId]);
+    if (issueResult.rows.length === 0) {
+        throw new Error("Issue not found");
+    }
+    const existingIssue = issueResult.rows[0];
+
+    if (currentUser.role === "contributor") {
+
+        if (
+            existingIssue.reporter_id !== currentUser.id
+        ) {
+            throw new Error(
+                "You are not authorized to update this issue"
+            );
+        }
+   
+        if (existingIssue.status !== "open") {
+            throw new Error(
+                "You can only update open issues"
+            );
+        }
+    }
+
+    const fields = [];
+    const values = [];
+
+    if (payload.title) {
+        values.push(payload.title);
+
+        fields.push(
+            `title = $${values.length}`
+        );
+    }
+
+    if (payload.description) {
+        values.push(payload.description);
+
+        fields.push(
+            `description = $${values.length}`
+        );
+    }
+
+    if (payload.type) {
+        values.push(payload.type);
+
+        fields.push(
+            `type = $${values.length}`
+        );
+    }
+
+    fields.push(
+        `updated_at = CURRENT_TIMESTAMP`
+    );
+
+    values.push(issueId);
+
+    const sqlQuery = `
+        UPDATE issues
+        SET ${fields.join(", ")}
+        WHERE id = $${values.length}
+        RETURNING *
+    `;
+
+    const updatedResult = await pool.query(
+        sqlQuery,
+        values
+    );
+
+    return updatedResult.rows[0];
+}
 export const issuesServices = {
     createIssuesIntoDB,
     getAllIssuesFromDB,
-    getSingleIssueFromDB
+    getSingleIssueFromDB,
+    updateIssueIntoDB
 }
