@@ -134,7 +134,13 @@ const updateIssueIntoDB = async (issueId: string, payload: any, currentUser: any
     }
     const existingIssue = issueResult.rows[0];
 
-    if (currentUser.role === "contributor") {
+    const userRole = currentUser.role;
+    if (!(userRole === "contributor" || userRole === "maintainer")) {
+        throw new Error(
+            "You are not authorized to update issue"
+        );
+    }
+    if (userRole === "contributor") {
 
         if (
             existingIssue.reporter_id !== currentUser.id
@@ -223,7 +229,7 @@ const deleteIssueFromDB = async (issueId: string, currentUser: any) => {
             "Issue not found"
         );
     }
-    
+
     await pool.query(
         `
         DELETE FROM issues
