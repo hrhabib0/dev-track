@@ -6,6 +6,13 @@ const createIssues = async (req: Request, res: Response) => {
     try {
         const { title, description, type } = req.body;
         const reporter_id = (req.user as JwtPayload).id;
+        const userRole = (req.user as JwtPayload).role;
+        if (!(userRole === "contributor" || userRole === "maintainer")) {
+            return res.status(403).json({
+                success: false,
+                message: "Forbidden",
+            });
+        }
         if (!(type === "bug" || type === "feature_request")) {
             return res.status(400).json({
                 success: false,
