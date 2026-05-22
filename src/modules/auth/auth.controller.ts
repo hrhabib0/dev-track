@@ -10,6 +10,12 @@ const signUpUser = async (req: Request, res: Response) => {
                 message: "Name, email and password are required",
             });
         }
+        if (!(role === "contributor" || role === "maintainer")) {
+            return res.status(400).json({
+                success: false,
+                message: "Role is not valid",
+            });
+        }
         const result = await authServices.signUpUserInotDb(req.body);
         return res.status(201).json({
             success: true,
