@@ -1,6 +1,7 @@
 import type { Request, Response } from "express"
 import type { JwtPayload } from "jsonwebtoken";
 import { issuesServices } from "./issues.services";
+import sendResponse from "../../utils/sendResponse";
 
 const createIssues = async (req: Request, res: Response) => {
     try {
@@ -8,15 +9,19 @@ const createIssues = async (req: Request, res: Response) => {
         const reporter_id = (req.user as JwtPayload).id;
         const userRole = (req.user as JwtPayload).role;
         if (!(userRole === "contributor" || userRole === "maintainer")) {
-            return res.status(403).json({
+            return sendResponse(res, {
+                statusCode: 403,
                 success: false,
                 message: "Forbidden",
+                data: null,
             });
         }
         if (!(type === "bug" || type === "feature_request")) {
-            return res.status(400).json({
+            return sendResponse(res, {
+                statusCode: 400,
                 success: false,
                 message: "Type must be bug or feature_request",
+                data: null,
             });
         }
         const issue = await issuesServices.createIssuesIntoDB({
@@ -25,15 +30,18 @@ const createIssues = async (req: Request, res: Response) => {
             type,
             reporter_id
         })
-        return res.status(201).json({
+        return sendResponse(res, {
+            statusCode: 201,
             success: true,
-            message: "Issue created successfully",
+            message: "Issue created  ad successfully",
             data: issue,
         });
     } catch (error: any) {
-        return res.status(400).json({
+        return sendResponse(res, {
+            statusCode: 400,
             success: false,
             message: error.message,
+            data: null,
         });
     }
 }
