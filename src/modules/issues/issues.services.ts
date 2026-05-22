@@ -143,7 +143,7 @@ const updateIssueIntoDB = async (issueId: string, payload: any, currentUser: any
                 "You are not authorized to update this issue"
             );
         }
-   
+
         if (existingIssue.status !== "open") {
             throw new Error(
                 "You can only update open issues"
@@ -198,9 +198,45 @@ const updateIssueIntoDB = async (issueId: string, payload: any, currentUser: any
 
     return updatedResult.rows[0];
 }
+
+// delete a Issue from db
+const deleteIssueFromDB = async (issueId: string, currentUser: any) => {
+    if (currentUser.role !== "maintainer") {
+        throw new Error(
+            "Only maintainers can delete issues"
+        );
+    }
+
+    const issueResult = await pool.query(
+        `
+        SELECT *
+        FROM issues
+        WHERE id = $1
+        `,
+        [issueId]
+    );
+
+    const existingIssue = issueResult.rows[0];
+
+    if (!existingIssue) {
+        throw new Error(
+            "Issue not found"
+        );
+    }
+    
+    await pool.query(
+        `
+        DELETE FROM issues
+        WHERE id = $1
+        `,
+        [issueId]
+    );
+}
+
 export const issuesServices = {
     createIssuesIntoDB,
     getAllIssuesFromDB,
     getSingleIssueFromDB,
-    updateIssueIntoDB
+    updateIssueIntoDB,
+    deleteIssueFromDB
 }
