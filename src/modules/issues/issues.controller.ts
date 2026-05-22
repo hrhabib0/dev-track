@@ -6,6 +6,12 @@ const createIssues = async (req: Request, res: Response) => {
     try {
         const { title, description, type } = req.body;
         const reporter_id = (req.user as JwtPayload).id;
+        if (!(type === "bug" || type === "feature_request")) {
+            return res.status(400).json({
+                success: false,
+                message: "Type must be bug or feature_request",
+            });
+        }
         const issue = await issuesServices.createIssuesIntoDB({
             title,
             description,
